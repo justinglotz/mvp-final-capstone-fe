@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 import { useAuth } from '@/utils/context/authContext';
 import getVenues from '../api/venuedata';
 import getArtists from '../api/artistdata';
@@ -21,14 +22,13 @@ export default function ConcertForm({ concert = initialState }) {
   const { user } = useAuth();
   const router = useRouter();
 
-  // normalize obj when it changes
   useEffect(() => {
     if (concert && concert.id) {
       setFormInput({
         id: concert.id,
         date: concert.date || '',
-        venue: concert.venue?.id?.toString() || '', // ✅ ensure string ID
-        artists: concert.artists ? concert.artists.map((a) => a.id.toString()) : [], // ✅ array of string IDs
+        venue: concert.venue?.id?.toString() || '',
+        artists: concert.artists ? concert.artists.map((a) => a.id.toString()) : [],
       });
     } else {
       setFormInput(initialState);
@@ -105,3 +105,18 @@ export default function ConcertForm({ concert = initialState }) {
     </Form>
   );
 }
+
+ConcertForm.propTypes = {
+  concert: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    date: PropTypes.string,
+    venue: PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    }),
+    artists: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      }),
+    ),
+  }),
+};
